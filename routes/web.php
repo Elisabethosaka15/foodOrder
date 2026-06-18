@@ -18,7 +18,7 @@ switch($page)
 
     case 'user':
         require
-        'views/user/dashboard.php';
+        './views/user/dasboard.php';
         break;
 
     default:
