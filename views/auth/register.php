@@ -1,10 +1,9 @@
 <?php
 
 $auth =
-new AuthController();
+    new AuthController();
 
-if($auth->register())
-{
+if ($auth->register()) {
     echo "
     <script>
     alert('Registrasi Berhasil');
@@ -16,64 +15,68 @@ if($auth->register())
 
 <?php include 'views/layouts/header.php'; ?>
 
-<div class="container mt-5">
+<div class="auth-wrapper">
+    <div class="auth-box">
+        <div class="card">
+            <h2 class="auth-title">Register FoodOrder</h2>
+            <div class="auth-subtitle">Silakan buat akun Anda</div>
 
-<div class="row justify-content-center">
+            <form method="POST" class="auth-form">
+                <div class="auth-form-group">
+                    <label>Nama Lengkap</label>
+                    <input
+                        type="text"
+                        name="nama"
+                        placeholder="Masukkan nama"
+                        class="form-input"
+                        required>
+                </div>
+                <div class="auth-form-group">
+                    <label>Username</label>
+                    <input
+                        type="text"
+                        name="username"
+                        placeholder="Masukkan username"
+                        class="form-input"
+                        required>
+                </div>
+                <div class="auth-form-group">
+                    <label>email</label>
+                    <input
+                        type="email"
+                        name="email"
+                        placeholder="Masukkan email"
+                        class="form-input"
+                        required>
+                </div>
 
-<div class="col-md-6">
+                <div class="auth-form-group">
+                    <label>Password</label>
+                    <input
+                        type="password"
+                        name="password"
+                        placeholder="Masukkan password"
+                        class="form-input"
+                        required>
+                </div>
 
-<div class="card">
+                <button
+                    type="submit"
+                    name="login"
+                    class="btn-primary">
+                    <i class="fa-solid fa-right-to-bracket"></i> Login
+                </button>
+            </form>
 
-<div class="card-body">
-
-<h2 class="title-food text-center">
-Register
-</h2>
-
-<form method="POST">
-
-<input
-type="text"
-name="nama"
-class="form-control mb-3"
-placeholder="Nama"
-required>
-
-<input
-type="text"
-name="username"
-class="form-control mb-3"
-placeholder="Username"
-required>
-
-<input
-type="email"
-name="email"
-class="form-control mb-3"
-placeholder="Email"
-required>
-
-<input
-type="password"
-name="password"
-class="form-control mb-3"
-placeholder="Password"
-required>
-
-<button
-name="register"
-class="btn btn-food w-100">
-Daftar
-</button>
-
-</form>
-
+            <div class="auth-footer-text">
+                <p>
+                    Belum punya akun?
+                </p>
+                <a href="index.php?page=login">Login</a>
+            </div>
+        </div>
+    </div>
 </div>
-</div>
 
-</div>
-</div>
-</div>
 
 <?php include 'views/layouts/footer.php'; ?>
-

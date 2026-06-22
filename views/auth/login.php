@@ -2,18 +2,14 @@
 
 $auth = new AuthController();
 
-if($auth->login())
-{
-    if($_SESSION['role'] == 'admin')
-    {
+if ($auth->login()) {
+    if ($_SESSION['role'] == 'admin') {
         header(
-        "Location:index.php?page=admin"
+            "Location:index.php?page=admin"
         );
-    }
-    else
-    {
+    } else {
         header(
-        "Location:index.php?page=user"
+            "Location:index.php"
         );
     }
 
@@ -21,66 +17,55 @@ if($auth->login())
 }
 
 include
-'views/layouts/header.php';
+    'views/layouts/header.php';
 ?>
 
-<div class="login-box">
+<div class="auth-wrapper">
+    <div class="auth-box">
+        <div class="card">
+            <h2 class="auth-title">Login FoodOrder</h2>
+            <div class="auth-subtitle">Silakan masuk untuk melanjutkan pesanan Anda</div>
 
-    <div class="card">
+            <form method="POST" class="auth-form">
+                <div class="auth-form-group">
+                    <label>Username</label>
+                    <input
+                        type="text"
+                        name="username"
+                        placeholder="Masukkan username"
+                        class="form-input"
+                        required>
+                </div>
 
-        <h2 align="center">
-            Login FoodOrder
-        </h2>
+                <div class="auth-form-group">
+                    <label>Password</label>
+                    <input
+                        type="password"
+                        name="password"
+                        placeholder="Masukkan password"
+                        class="form-input"
+                        required>
+                </div>
 
-        <br>
+                <button
+                    type="submit"
+                    name="login"
+                    class="btn-primary">
+                    <i class="fa-solid fa-right-to-bracket"></i> Login
+                </button>
+            </form>
 
-        <form method="POST">
-
-            <input
-            type="text"
-            name="username"
-            placeholder="Username"
-            class="form-control"
-            required>
-
-            <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            class="form-control"
-            required>
-
-            <button
-            type="submit"
-            name="login"
-            class="btn btn-primary">
-
-                Login
-
-            </button>
-
-        </form>
-
-        <br>
-
-        <p align="center">
-
-            Belum punya akun?
-
-            <a href="index.php?page=register">
-
-                Register
-
-            </a>
-
-        </p>
-
+            <div class="auth-footer-text">
+                <p>
+                    Belum punya akun?
+                </p>
+                <a href="index.php?page=register">Register</a>
+            </div>
+        </div>
     </div>
-
 </div>
 
 <?php
 include
-'views/layouts/footer.php';
+    'views/layouts/footer.php';
 ?>
-

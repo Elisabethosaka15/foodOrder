@@ -9,20 +9,19 @@ class AuthController
     public function __construct()
     {
         $this->user =
-        new User();
+            new User();
     }
 
     public function register()
     {
-        if(isset($_POST['register']))
-        {
+        if (isset($_POST['register'])) {
             return
-            $this->user->create(
-                $_POST['nama'],
-                $_POST['username'],
-                $_POST['email'],
-                $_POST['password']
-            );
+                $this->user->create(
+                    $_POST['nama'],
+                    $_POST['username'],
+                    $_POST['email'],
+                    $_POST['password']
+                );
         }
 
         return false;
@@ -30,27 +29,28 @@ class AuthController
 
     public function login()
     {
-        if(isset($_POST['login']))
-        {
+        if (isset($_POST['login'])) {
             $user =
-            $this->user
-            ->getByUsername(
-                $_POST['username']
-            );
+                $this->user
+                ->getByUsername(
+                    $_POST['username']
+                );
 
-            if(
+            if (
                 $user &&
                 password_verify(
                     $_POST['password'],
                     $user['password']
                 )
-            )
-            {
+            ) {
                 $_SESSION['user_id']
                     = $user['id'];
 
                 $_SESSION['nama']
                     = $user['nama'];
+                $_SESSION['username']
+                    = $user['username'];
+
 
                 $_SESSION['role']
                     = $user['role'];
@@ -61,5 +61,17 @@ class AuthController
 
         return false;
     }
-}
 
+    public function logout()
+    {
+        if (isset($_POST['logout'])) {
+
+            session_destroy();
+
+            header(
+                "Location:index.php?page=login"
+            );
+            exit;
+        }
+    }
+}
