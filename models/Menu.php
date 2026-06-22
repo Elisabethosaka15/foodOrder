@@ -1,6 +1,6 @@
 <?php
 
-require_once "../config/Database.php";
+require_once "config/Database.php";
 
 class Menu extends Database
 {
@@ -9,16 +9,9 @@ class Menu extends Database
         $conn = $this->connect();
 
         $sql =
-        "SELECT
-            menu.*,
-            restoran.nama_restoran
-         FROM menu
-         JOIN restoran
-         ON menu.restoran_id =
-            restoran.id";
+        "SELECT * FROM menu";
 
-        return $conn
-                ->query($sql);
+        return $conn->query($sql);
     }
 
     public function find($id)

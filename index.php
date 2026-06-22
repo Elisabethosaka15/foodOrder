@@ -8,6 +8,10 @@ require_once
 
 require_once
 'controllers/AuthController.php';
+require_once
+'controllers/PesananController.php';
+require_once
+'controllers/MenuController.php';
 
 Session::start();
 

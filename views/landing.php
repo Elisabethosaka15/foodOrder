@@ -1,6 +1,13 @@
-<?php include './views/layouts/header.php' ;
+<?php include './views/layouts/header.php';
 
 $auth = new AuthController();
+$pesan = new PesananController();
+$menu = new MenuController();
+
+
+// if($pesan->pesanan()){
+// }
+
 
 if ($auth->logout()) {
     echo "
@@ -9,6 +16,7 @@ if ($auth->logout()) {
     </script>
     ";
 }
+
 ?>
 
 <!-- HEADER & NAVBAR (Koneksi database: 'users' untuk data user login) -->
@@ -104,26 +112,44 @@ if ($auth->logout()) {
                      Kemudian lakukan perulangan PHP: foreach ($menu_items as $item) { ... }
                 -->
             <div class="menu-grid" id="menu-container">
+                <?php $result = $menu->getMenu()?>
 
-                <!-- Item Menu 1 (Makanan) -->
-                <div class="menu-item" data-category="Makanan" data-id="1">
-                    <div class="item-media">
-                        <i class="fa-solid fa-bowl-rice"></i>
-                        <span class="item-db-id">ID Menu: 1</span>
-                    </div>
-                    <div class="item-content">
-                        <h3 class="item-title">Nasi Goreng Kampung</h3>
-                        <p class="item-desc">Nasi goreng bumbu rempah tradisional khas jawa lengkap dengan telur mata sapi dan kerupuk garing.</p>
-                        <div class="item-action-area">
-                            <span class="item-price">Rp 25.000</span>
-                            <button onclick="openOrderModal(1, 'Nasi Goreng Kampung', 25000)" class="btn-order">
-                                Pesan Sekarang
-                            </button>
+                <?php while ($row= $result->fetch_assoc()) { ?>
+                    <!-- Item Menu 1 (Makanan) -->
+                    <div class="menu-item" data-category="<?= $row['kategori']; ?>" data-id="<?= $row['id']; ?>">
+                        <div class="item-media">
+                            <i class="fa-solid fa-bowl-rice"></i>
+                            <span class="item-db-id">ID Menu: <?= $row['id']; ?></span>
+                        </div>
+
+                        <div class="item-content">
+                            <h3 class="item-title"><?= $row['nama_menu']; ?></h3>
+
+                            <p class="item-desc">
+                                <?= $row['deskripsi']; ?>
+                            </p>
+
+                            <div class="item-action-area">
+                                <span class="item-price">
+                                    Rp <?= number_format($row['harga'], 0, ',', '.'); ?>
+                                </span>
+
+                                <button
+                                    onclick="openOrderModal(
+                        <?= $row['id']; ?>,
+                        '<?= $row['nama_menu']; ?>',
+                        <?= $row['harga']; ?>
+                    )"
+                                    class="btn-order">
+                                    Pesan Sekarang
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-
-                <!-- Item Menu 2 (Makanan) -->
+                <?php
+                }
+                ?>
+                <!-- Item Menu 2 (Makanan)
                 <div class="menu-item" data-category="Makanan" data-id="2">
                     <div class="item-media">
                         <i class="fa-solid fa-pepper-hot"></i>
@@ -157,7 +183,7 @@ if ($auth->logout()) {
                             </button>
                         </div>
                     </div>
-                </div>
+                </div> 
 
             </div>
         </div>
@@ -190,7 +216,7 @@ if ($auth->logout()) {
         </div>
 
         <!-- Form input pemesanan -->
-        <form id="direct-order-form" onsubmit="handleDirectOrder(event)">
+        <form id="direct-order-form" method="post">
             <!-- Input tersembunyi sebagai acuan pengiriman data ke server controller PHP -->
             <input type="hidden" id="input-menu-id" name="id_menu">
             <input type="hidden" id="input-menu-harga">
@@ -235,7 +261,7 @@ if ($auth->logout()) {
                      3. Tambah data di `detail_pesanan` -> Masukkan id_pesanan, id_menu, jumlah porsi.
                      4. Tambah data di `pembayaran` -> Catat metode pembayaran pelanggan.
                 -->
-            <button type="submit" class="btn-submit-order">
+            <button type="submit" class="btn-submit-order" name="pesan">
                 <i class="fa-solid fa-circle-check"></i> Kirim & Konfirmasi Pesanan
             </button>
         </form>
@@ -267,7 +293,6 @@ if ($auth->logout()) {
     </div>
 </div>
 
-<!-- SCRIPT UTAMA - INTERAKSI NATIVE JAVASCRIPT -->
 <script>
     // DOM Elements
     const mainHeader = document.getElementById('main-header');
@@ -338,12 +363,7 @@ if ($auth->logout()) {
         const paymentMethod = document.getElementById('payment-method').value;
         const totalPrice = orderTotalPrice.textContent;
 
-        const dbSimulationLog = `<strong>Selamat Kak ${customerName}!</strong> Pesanan Anda berhasil dicatat.<br><br>` +
-            `<strong>Log Sistem Penyimpanan Database (OOP MVC):</strong><br>` +
-            `1. <code>INSERT INTO users</code> (nama_user) ➜ "${customerName}"<br>` +
-            `2. <code>INSERT INTO pesanan</code> (total_harga, status) ➜ "${totalPrice}", "Proses"<br>` +
-            `3. <code>INSERT INTO detail_pesanan</code> (id_menu, jumlah) ➜ "${menuName}" (${qty} porsi)<br>` +
-            `4. <code>INSERT INTO pembayaran</code> (metode_pembayaran) ➜ "${paymentMethod}"`;
+        const dbSimulationLog = `<strong>Selamat Kak ${customerName}!</strong> Pesanan Anda berhasil dicatat.<br><br>`;
 
         closeOrderModal();
 
