@@ -4,25 +4,22 @@ $auth = new AuthController();
 $pesan = new PesananController();
 $menu = new MenuController();
 
-
-// if($pesan->pesanan()){
-// }
-
-
-if ($auth->logout()) {
-    echo "
-      <script>
-    alert('Login Berhasil');
-    </script>
-    ";
+// MEMPERBAIKI LOGIKA LOGOUT: Hanya berjalan jika tombol logout ditekan
+if (isset($_POST['logout'])) {
+    if ($auth->logout()) {
+        echo "
+        <script>
+        alert('Logout Berhasil');
+        window.location.href = 'index.php';
+        </script>
+        ";
+        exit;
+    }
 }
-
 ?>
 
-<!-- HEADER & NAVBAR (Koneksi database: 'users' untuk data user login) -->
 <header class="header" id="main-header">
     <div class="container">
-        <!-- Brand Logo -->
         <div class="logo">
             <span class="logo-icon">
                 <i class="fa-solid fa-utensils"></i>
@@ -30,25 +27,24 @@ if ($auth->logout()) {
             <span class="logo-text">Rasa<span>Nusantara</span></span>
         </div>
 
-        <!-- Navigasi -->
         <nav class="nav">
             <a href="#beranda" class="nav-link active" id="nav-beranda">Beranda</a>
             <a href="#menu" class="nav-link" id="nav-menu">Daftar Menu</a>
         </nav>
 
-        <!-- Profil User / login -->
         <div class="user-action">
-            <!-- PHP INTEGRATION NOTE: 
-                     Gunakan session PHP ($_SESSION['user']) untuk memeriksa status login.
-                     Jika ada session, ganti tombol login dengan nama user dan opsi logout.
-                -->
-            <?php if ($_SESSION['nama']) : ?>
-                <div class="user-wrap">
-                    <span class="user-label">Halo, <?= $_SESSION['nama'] ?></span>
+            <?php if (isset($_SESSION['nama'])) : ?>
+                <!-- Mengatur wrapper agar elemen teks nama dan tombol sejajar secara vertikal -->
+                <div class="user-wrap" style="display: flex; align-items: center; gap: 12px;">
+                    <span class="user-label" style="display: inline; font-size: 0.85rem; font-weight: 600; color: var(--slate-700);">
+                        Halo, <?= $_SESSION['nama'] ?>
+                    </span>
 
-                    <form method="post">
-                        <button name="logout" class="btn btn-danger">
-                            Logout
+                    <!-- Menggunakan form dengan margin reset agar tidak mengacaukan tinggi flexbox header -->
+                    <form method="post" action="" style="margin: 0; display: inline-block;">
+                        <!-- Menggunakan class btn-auth dengan sedikit custom inline style berwarna merah agar kontras dan elegan -->
+                        <button name="logout" type="submit" class="btn-auth" style="color: var(--primary); border-color: var(--primary-border); background-color: var(--primary-light); display: inline-flex; align-items: center; gap: 6px;">
+                            <i class="fa-solid fa-right-from-bracket"></i> Logout
                         </button>
                     </form>
                 </div>
@@ -61,15 +57,12 @@ if ($auth->logout()) {
     </div>
 </header>
 
-<!-- CONTENT UTAMA -->
 <main>
 
-    <!-- Hero Section -->
     <section id="beranda" class="hero">
         <div class="container">
             <div class="hero-grid">
 
-                <!-- Informasi Text Hero -->
                 <div class="hero-content">
                     <h1 class="hero-title">
                         Pesan Makanan <br>Favoritmu <span>Secara Instan</span>
@@ -82,13 +75,10 @@ if ($auth->logout()) {
                     </a>
                 </div>
 
-
-
             </div>
         </div>
     </section>
 
-    <!-- Menu Section (Hubungan dengan tabel database: 'menu') -->
     <section id="menu" class="menu-section">
         <div class="container">
 
@@ -98,7 +88,6 @@ if ($auth->logout()) {
                     <p>Sistem Pemesanan Langsung terintegrasi dengan tabel database</p>
                 </div>
 
-                <!-- Filter Kategori Native -->
                 <div class="filter-container">
                     <button onclick="filterMenu('semua')" class="menu-filter-btn active" data-category="semua">Semua</button>
                     <button onclick="filterMenu('Makanan')" class="menu-filter-btn" data-category="Makanan">Makanan</button>
@@ -106,16 +95,10 @@ if ($auth->logout()) {
                 </div>
             </div>
 
-            <!-- PHP INTEGRATION NOTE: 
-                     Di dalam backend MVC Anda, buat model untuk mengambil seluruh data dari tabel `menu`.
-                     Contoh query: "SELECT * FROM menu"
-                     Kemudian lakukan perulangan PHP: foreach ($menu_items as $item) { ... }
-                -->
             <div class="menu-grid" id="menu-container">
                 <?php $result = $menu->getMenu()?>
 
-                <?php while ($row= $result->fetch_assoc()) { ?>
-                    <!-- Item Menu 1 (Makanan) -->
+                <?php while ($row = $result->fetch_assoc()) { ?>
                     <div class="menu-item" data-category="<?= $row['kategori']; ?>" data-id="<?= $row['id']; ?>">
                         <div class="item-media">
                             <i class="fa-solid fa-bowl-rice"></i>
@@ -136,54 +119,17 @@ if ($auth->logout()) {
 
                                 <button
                                     onclick="openOrderModal(
-                        <?= $row['id']; ?>,
-                        '<?= $row['nama_menu']; ?>',
-                        <?= $row['harga']; ?>
-                    )"
+                                        <?= $row['id']; ?>,
+                                        '<?= addslashes($row['nama_menu']); ?>',
+                                        <?= $row['harga']; ?>
+                                    )"
                                     class="btn-order">
                                     Pesan Sekarang
                                 </button>
                             </div>
                         </div>
                     </div>
-                <?php
-                }
-                ?>
-                <!-- Item Menu 2 (Makanan)
-                <div class="menu-item" data-category="Makanan" data-id="2">
-                    <div class="item-media">
-                        <i class="fa-solid fa-pepper-hot"></i>
-                        <span class="item-db-id">ID Menu: 2</span>
-                    </div>
-                    <div class="item-content">
-                        <h3 class="item-title">Ayam Penyet Sambal Korek</h3>
-                        <p class="item-desc">Ayam goreng renyah bumbu kuning yang dipenyet dengan siraman sambal bawang korek pedas dan lalapan segar.</p>
-                        <div class="item-action-area">
-                            <span class="item-price">Rp 28.000</span>
-                            <button onclick="openOrderModal(2, 'Ayam Penyet Sambal Korek', 28000)" class="btn-order">
-                                Pesan Sekarang
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Item Menu 3 (Minuman) -->
-                <div class="menu-item" data-category="Minuman" data-id="3">
-                    <div class="item-media">
-                        <i class="fa-solid fa-glass-water"></i>
-                        <span class="item-db-id">ID Menu: 3</span>
-                    </div>
-                    <div class="item-content">
-                        <h3 class="item-title">Es Teh Manis Selasih</h3>
-                        <p class="item-desc">Minuman teh seduh wangi melati segar manis dengan sensasi biji selasih berkhasiat tinggi.</p>
-                        <div class="item-action-area">
-                            <span class="item-price">Rp 7.000</span>
-                            <button onclick="openOrderModal(3, 'Es Teh Manis Selasih', 7000)" class="btn-order">
-                                Pesan Sekarang
-                            </button>
-                        </div>
-                    </div>
-                </div> 
+                <?php } ?>
 
             </div>
         </div>
@@ -191,11 +137,9 @@ if ($auth->logout()) {
 
 </main>
 
-<!-- MODAL POPUP FORM PEMESANAN (Hubungan tabel: 'pesanan', 'detail_pesanan', dan 'pembayaran') -->
 <div id="order-modal" class="modal-overlay">
     <div class="modal-card" id="order-card">
 
-        <!-- Header Modal -->
         <div class="modal-header">
             <div class="modal-header-text">
                 <h3><i class="fa-solid fa-file-invoice" style="color: var(--primary);"></i> Form Pemesanan</h3>
@@ -206,7 +150,6 @@ if ($auth->logout()) {
             </button>
         </div>
 
-        <!-- Item Terpilih -->
         <div class="selected-item-box">
             <span>Menu Pilihan Anda</span>
             <div class="selected-item-detail">
@@ -215,13 +158,10 @@ if ($auth->logout()) {
             </div>
         </div>
 
-        <!-- Form input pemesanan -->
-        <form id="direct-order-form" method="post">
-            <!-- Input tersembunyi sebagai acuan pengiriman data ke server controller PHP -->
+        <form id="direct-order-form" method="post" action="">
             <input type="hidden" id="input-menu-id" name="id_menu">
             <input type="hidden" id="input-menu-harga">
 
-            <!-- Qty (Jumlah Pembelian) -> Disimpan ke tabel detail_pesanan.jumlah -->
             <div class="form-group">
                 <label class="form-label">Jumlah Porsi (Tabel: detail_pesanan)</label>
                 <div class="qty-control">
@@ -231,13 +171,11 @@ if ($auth->logout()) {
                 </div>
             </div>
 
-            <!-- Nama Lengkap Pemesan -> Disimpan ke tabel users (atau gunakan Session ID) -->
             <div class="form-group">
                 <label class="form-label">Nama Lengkap Pelanggan (Tabel: users)</label>
                 <input type="text" id="customer-name" name="nama_pelanggan" placeholder="Masukkan nama lengkap Anda" class="form-input" required>
             </div>
 
-            <!-- Metode Pembayaran -> Disimpan ke tabel pembayaran.metode_pembayaran -->
             <div class="form-group">
                 <label class="form-label">Metode Pembayaran (Tabel: pembayaran)</label>
                 <select id="payment-method" name="metode_pembayaran" class="form-input" style="cursor: pointer;">
@@ -247,20 +185,11 @@ if ($auth->logout()) {
                 </select>
             </div>
 
-            <!-- Total Pembayaran (Harga * Qty) -> Disimpan ke tabel pesanan.total_harga -->
             <div class="total-payment-row">
                 <span>Total Pembayaran:</span>
                 <span id="order-total-price">Rp 0</span>
             </div>
 
-            <!-- Tombol Submit Form -->
-            <!-- PHP INTEGRATION NOTE:
-                     Ketika diklik, data ini dikirimkan ke Controller (POST). Di Controller Anda:
-                     1. Ambil/buat data customer di tabel `users`.
-                     2. Tambah data di `pesanan` -> Simpan nilai total harga dan user id. Ambil ID pesanan baru.
-                     3. Tambah data di `detail_pesanan` -> Masukkan id_pesanan, id_menu, jumlah porsi.
-                     4. Tambah data di `pembayaran` -> Catat metode pembayaran pelanggan.
-                -->
             <button type="submit" class="btn-submit-order" name="pesan">
                 <i class="fa-solid fa-circle-check"></i> Kirim & Konfirmasi Pesanan
             </button>
@@ -269,7 +198,6 @@ if ($auth->logout()) {
     </div>
 </div>
 
-<!-- FOOTER RINKAS -->
 <footer class="footer">
     <div class="container">
         <p class="footer-main-text">RasaNusantara - Landing Page PHP Native MVC Framework</p>
@@ -277,7 +205,6 @@ if ($auth->logout()) {
     </div>
 </footer>
 
-<!-- CUSTOM ALERT DIALOG POPUP (Desain Premium Tanpa Alert Bawaan Browser) -->
 <div id="custom-alert" class="alert-overlay">
     <div class="alert-card">
         <div class="alert-icon-box">
@@ -353,30 +280,8 @@ if ($auth->logout()) {
         orderTotalPrice.textContent = `Rp ${subtotal.toLocaleString('id-ID')}`;
     }
 
-    // Mengirim dan memproses Form (Simulasi alur database MVC)
-    function handleDirectOrder(event) {
-        event.preventDefault();
-
-        const menuName = selectedMenuName.textContent;
-        const qty = inputQty.value;
-        const customerName = document.getElementById('customer-name').value;
-        const paymentMethod = document.getElementById('payment-method').value;
-        const totalPrice = orderTotalPrice.textContent;
-
-        const dbSimulationLog = `<strong>Selamat Kak ${customerName}!</strong> Pesanan Anda berhasil dicatat.<br><br>`;
-
-        closeOrderModal();
-
-        document.getElementById('customer-name').value = '';
-
-        setTimeout(() => {
-            showCustomAlert("Transaksi Sukses!", dbSimulationLog);
-        }, 300);
-    }
-
     // Filter Kategori Hidangan
     function filterMenu(category) {
-        // Perbarui class active pada tombol
         const buttons = document.querySelectorAll('.menu-filter-btn');
         buttons.forEach(btn => {
             if (btn.getAttribute('data-category') === category) {
@@ -386,7 +291,6 @@ if ($auth->logout()) {
             }
         });
 
-        // Saring card list menu
         const items = document.querySelectorAll('.menu-item');
         items.forEach(item => {
             if (category === 'semua' || item.getAttribute('data-category') === category) {
@@ -432,5 +336,5 @@ if ($auth->logout()) {
     });
 </script>
 </body>
-
 </html>
+

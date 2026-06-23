@@ -62,15 +62,15 @@ if ($auth->register()) {
 
                 <button
                     type="submit"
-                    name="login"
+                    name="register"
                     class="btn-primary">
-                    <i class="fa-solid fa-right-to-bracket"></i> Login
+                    <i class="fa-solid fa-right-to-bracket"></i> Register
                 </button>
             </form>
 
             <div class="auth-footer-text">
                 <p>
-                    Belum punya akun?
+                    Sudah punya akun?
                 </p>
                 <a href="index.php?page=login">Login</a>
             </div>

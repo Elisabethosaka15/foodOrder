@@ -8,81 +8,89 @@ class PesananController
 
     public function __construct()
     {
+        // Instansiasi model Pesanan sesuai arsitektur OOP MVC Anda
         $this->pesanan = new Pesanan();
     }
 
+    /**
+     * Menangani pembuatan pesanan langsung dari form pelanggan (landing.php)
+     */
     public function pesan()
     {
-        if(isset($_POST['pesan']))
-        {
+        if (isset($_POST['pesan'])) {
             /*
             ========================
-            Ambil Data Form
+            Ambil Data Form $_POST
             ========================
             */
-
-            $jumlah = $_POST['jumlah'];
             $idMenu = $_POST['id_menu'];
+            $jumlah = $_POST['jumlah'];
             $namaPelanggan = $_POST['nama_pelanggan'];
             $metodePembayaran = $_POST['metode_pembayaran'];
+            
+            // Ambil total_harga dari input hidden form, atau hitung secara manual sebagai cadangan
+            $totalHarga = isset($_POST['total_harga']) ? $_POST['total_harga'] : (25000 * $jumlah);
 
             /*
             ========================
-            Sementara
+            User Login Session Check
             ========================
             */
-
-            $hargaMenu = 25000;
-
-            $totalHarga =
-            $hargaMenu * $jumlah;
+            $userId = $_SESSION['id'] ?? NULL;
 
             /*
             ========================
-            User Login
+            Penyusunan Data Pesanan
             ========================
             */
-
-            $userId =
-            $_SESSION['user_id'] ?? 1;
-
-            /*
-            ========================
-            Data Pesanan
-            ========================
-            */
-
             $data = [
-
                 'user_id' => $userId,
-
-                'metode' => 'Ambil Sendiri',
-
-                'total' => $totalHarga
-
+                'id_menu' => $idMenu,
+                'jumlah' => $jumlah,
+                'nama_pelanggan' => $namaPelanggan,
+                'metode_pembayaran' => $metodePembayaran,
+                'total_harga' => $totalHarga,
+                'tanggal_pesanan' => date('Y-m-d H:i:s')
             ];
 
-            $simpan =
-            $this->pesanan
-                 ->create($data);
+            // Kirim data ke Model Pesanan untuk memproses transaksi database (multi-table insert)
+            $simpan = $this->pesanan->create($data);
 
-            if($simpan)
-            {
+            if ($simpan) {
                 echo "
                 <script>
-                    alert('Pesanan berhasil dibuat');
-                    window.location='riwayat.php';
+                    alert('Pesanan berhasil dibuat! Silakan lakukan pembayaran.');
+                    window.location.href = 'index.php';
                 </script>
                 ";
-            }
-            else
-            {
+                exit;
+            } else {
                 echo "
                 <script>
-                    alert('Pesanan gagal dibuat');
+                    alert('Pesanan gagal dibuat. Silakan coba lagi.');
                 </script>
                 ";
             }
         }
     }
+
+    /**
+     * Memanggil seluruh data pesanan untuk dashboard admin
+     */
+    public function getAllPesanan()
+    {
+        // Mendelegasikan pencarian data ke Model Pesanan
+        return $this->pesanan->getAll();
+    }
+
+    /**
+     * Melakukan validasi & pembaruan status pesanan serta pembayaran (Aksi Admin)
+     */
+    public function updateStatusPesanan($id_pesanan, $status_pesanan, $status_pembayaran)
+    {
+        // Mendelegasikan pembaruan status ke Model Pesanan
+        return $this->pesanan->updateStatus($id_pesanan, $status_pesanan, $status_pembayaran);
+    }
 }
+?>
+
