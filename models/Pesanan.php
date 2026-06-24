@@ -281,6 +281,66 @@ class Pesanan extends Database
         return $conn->query($query);
     }
 
+    public function getRiwayatByUserId($userId)
+    {
+        $conn = $this->connect();
+
+        $stmt = $conn->prepare(
+            "SELECT
+
+                p.id,
+
+                p.kode_pesanan,
+
+                p.nama_penerima,
+
+                p.no_hp,
+
+                p.total_harga,
+
+                p.status AS status_pesanan,
+
+                p.created_at AS tanggal,
+
+                u.nama,
+
+                m.nama_menu,
+
+                dp.harga,
+
+                dp.jumlah,
+
+                dp.subtotal,
+
+                pem.metode_pembayaran,
+
+                pem.status AS status_pembayaran
+
+            FROM pesanan p
+
+            LEFT JOIN users u
+            ON p.user_id = u.id
+
+            LEFT JOIN detail_pesanan dp
+            ON p.id = dp.pesanan_id
+
+            LEFT JOIN menu m
+            ON dp.menu_id = m.id
+
+            LEFT JOIN pembayaran pem
+            ON p.id = pem.pesanan_id
+
+            WHERE p.user_id = ?
+
+            ORDER BY p.id DESC"
+        );
+
+        $stmt->bind_param('i', $userId);
+        $stmt->execute();
+
+        return $stmt->get_result();
+    }
+
     /*
     =====================================
     UPDATE STATUS PESANAN

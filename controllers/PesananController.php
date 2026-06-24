@@ -86,6 +86,14 @@ class PesananController
     }
 
     /**
+     * Mengambil riwayat pesanan untuk user yang sedang login
+     */
+    public function getRiwayatBelanjaUser($userId)
+    {
+        return $this->pesanan->getRiwayatByUserId($userId);
+    }
+
+    /**
      * Melakukan validasi & pembaruan status pesanan serta pembayaran (Aksi Admin)
      */
     public function updateStatusPesanan($id_pesanan, $status_pesanan, $status_pembayaran)

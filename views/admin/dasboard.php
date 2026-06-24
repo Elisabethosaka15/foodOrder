@@ -12,6 +12,43 @@ if (isset($_POST['logout'])) {
         exit;
     }
 }
+
+$pesan = new PesananController();
+$message = null;
+
+if (isset($_POST['update_status'])) {
+    $idPesanan = intval($_POST['id_pesanan']);
+    $statusPesanan = $_POST['status_pesanan'];
+    $statusPembayaran = $_POST['status_pembayaran'];
+
+    if ($pesan->updateStatusPesanan($idPesanan, $statusPesanan, $statusPembayaran)) {
+        $message = "Status pesanan #$idPesanan berhasil diperbarui.";
+    } else {
+        $message = "Gagal memperbarui status pesanan #$idPesanan.";
+    }
+}
+
+$pesananResult = $pesan->getAllPesanan();
+$pesananData = [];
+$stats = [
+    'pending' => 0,
+    'success' => 0,
+    'failed' => 0
+];
+
+if ($pesananResult) {
+    while ($row = $pesananResult->fetch_assoc()) {
+        $pesananData[] = $row;
+
+        if ($row['status'] === 'Selesai') {
+            $stats['success']++;
+        } elseif ($row['status'] === 'Batal') {
+            $stats['failed']++;
+        } else {
+            $stats['pending']++;
+        }
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -303,6 +340,24 @@ if (isset($_POST['logout'])) {
             background-color: var(--primary-hover);
         }
 
+        .notification-banner {
+            margin-bottom: 24px;
+            padding: 18px 22px;
+            border-radius: 16px;
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            background-color: #ecfdf5;
+            color: #065f46;
+            font-size: 0.95rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .notification-banner strong {
+            display: block;
+            font-weight: 800;
+            margin-bottom: 6px;
+            color: #047857;
+        }
+
         /* --- FOOTER --- */
         .footer {
             background-color: var(--slate-900);
@@ -425,6 +480,13 @@ if (isset($_POST['logout'])) {
     </header>
 
     <div class="container">
+        <?php if (!empty($message)): ?>
+            <div class="notification-banner">
+                <strong>Notifikasi</strong>
+                <?= htmlspecialchars($message) ?>
+            </div>
+        <?php endif; ?>
+
         <!-- Title Section -->
         <div class="admin-title-section">
             <div>
@@ -440,7 +502,7 @@ if (isset($_POST['logout'])) {
                     <i class="fa-solid fa-hourglass-half"></i>
                 </div>
                 <div class="stat-info">
-                    <h3 id="count-pending">2</h3>
+                    <h3 id="count-pending"><?= $stats['pending'] ?></h3>
                     <p>Menunggu Pembayaran</p>
                 </div>
             </div>
@@ -450,7 +512,7 @@ if (isset($_POST['logout'])) {
                     <i class="fa-solid fa-circle-check"></i>
                 </div>
                 <div class="stat-info">
-                    <h3 id="count-success">1</h3>
+                    <h3 id="count-success"><?= $stats['success'] ?></h3>
                     <p>Pesanan Selesai</p>
                 </div>
             </div>
@@ -460,7 +522,7 @@ if (isset($_POST['logout'])) {
                     <i class="fa-solid fa-circle-xmark"></i>
                 </div>
                 <div class="stat-info">
-                    <h3 id="count-failed">1</h3>
+                    <h3 id="count-failed"><?= $stats['failed'] ?></h3>
                     <p>Dibatalkan</p>
                 </div>
             </div>
@@ -483,138 +545,63 @@ if (isset($_POST['logout'])) {
                     </tr>
                 </thead>
                 <tbody id="pesanan-tbody">
-                    <!-- Row 1 -->
-                    <tr id="row-101">
-                        <td style="font-weight: 700; color: var(--slate-900);">#101</td>
-                        <td style="font-size: 0.75rem;">23 Jun 2026, 19:45</td>
-                        <td>Ahmad Fauzi</td>
-                        <td>
-                            <strong>Nasi Goreng Kampung</strong>
-                            <span style="font-size: 0.75rem; color: var(--slate-400); display: block;">Jumlah: 2 Porsi</span>
-                        </td>
-                        <td><span style="font-size: 0.75rem; font-weight: 600;">Transfer Bank</span></td>
-                        <td style="font-weight: 800; color: var(--slate-900);">Rp 50.000</td>
-                        <td class="cell-status-pesanan">
-                            <span class="badge badge-pending"><i class="fa-solid fa-spinner fa-spin"></i> Proses</span>
-                        </td>
-                        <td class="cell-status-pembayaran">
-                            <span class="badge badge-pending"><i class="fa-solid fa-circle-exclamation"></i> Belum Lunas</span>
-                        </td>
-                        <td style="text-align: center;">
-                            <div style="display: flex; gap: 8px; justify-content: center; align-items: center;">
-                                <select class="status-select select-pesanan">
-                                    <option value="Proses" selected>Proses</option>
-                                    <option value="Selesai">Selesai</option>
-                                    <option value="Batal">Batal</option>
-                                </select>
-                                <select class="status-select select-pembayaran">
-                                    <option value="Belum Lunas" selected>Belum Lunas</option>
-                                    <option value="Lunas">Lunas</option>
-                                </select>
-                                <button onclick="saveStatus(101)" class="btn-primary">Simpan</button>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <!-- Row 2 -->
-                    <tr id="row-102">
-                        <td style="font-weight: 700; color: var(--slate-900);">#102</td>
-                        <td style="font-size: 0.75rem;">23 Jun 2026, 18:20</td>
-                        <td>Siti Rahma</td>
-                        <td>
-                            <strong>Ayam Penyet Sambal Korek</strong>
-                            <span style="font-size: 0.75rem; color: var(--slate-400); display: block;">Jumlah: 1 Porsi</span>
-                        </td>
-                        <td><span style="font-size: 0.75rem; font-weight: 600;">E-Wallet</span></td>
-                        <td style="font-weight: 800; color: var(--slate-900);">Rp 28.000</td>
-                        <td class="cell-status-pesanan">
-                            <span class="badge badge-success"><i class="fa-solid fa-check"></i> Selesai</span>
-                        </td>
-                        <td class="cell-status-pembayaran">
-                            <span class="badge badge-success"><i class="fa-solid fa-circle-check"></i> Lunas</span>
-                        </td>
-                        <td style="text-align: center;">
-                            <div style="display: flex; gap: 8px; justify-content: center; align-items: center;">
-                                <select class="status-select select-pesanan">
-                                    <option value="Proses">Proses</option>
-                                    <option value="Selesai" selected>Selesai</option>
-                                    <option value="Batal">Batal</option>
-                                </select>
-                                <select class="status-select select-pembayaran">
-                                    <option value="Belum Lunas">Belum Lunas</option>
-                                    <option value="Lunas" selected>Lunas</option>
-                                </select>
-                                <button onclick="saveStatus(102)" class="btn-primary">Simpan</button>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <!-- Row 3 -->
-                    <tr id="row-103">
-                        <td style="font-weight: 700; color: var(--slate-900);">#103</td>
-                        <td style="font-size: 0.75rem;">23 Jun 2026, 17:10</td>
-                        <td>Budi Santoso</td>
-                        <td>
-                            <strong>Es Teh Manis Selasih</strong>
-                            <span style="font-size: 0.75rem; color: var(--slate-400); display: block;">Jumlah: 3 Porsi</span>
-                        </td>
-                        <td><span style="font-size: 0.75rem; font-weight: 600;">Tunai (COD)</span></td>
-                        <td style="font-weight: 800; color: var(--slate-900);">Rp 21.000</td>
-                        <td class="cell-status-pesanan">
-                            <span class="badge badge-danger"><i class="fa-solid fa-xmark"></i> Batal</span>
-                        </td>
-                        <td class="cell-status-pembayaran">
-                            <span class="badge badge-danger"><i class="fa-solid fa-circle-xmark"></i> Batal</span>
-                        </td>
-                        <td style="text-align: center;">
-                            <div style="display: flex; gap: 8px; justify-content: center; align-items: center;">
-                                <select class="status-select select-pesanan">
-                                    <option value="Proses">Proses</option>
-                                    <option value="Selesai">Selesai</option>
-                                    <option value="Batal" selected>Batal</option>
-                                </select>
-                                <select class="status-select select-pembayaran">
-                                    <option value="Belum Lunas">Belum Lunas</option>
-                                    <option value="Lunas">Lunas</option>
-                                    <option value="Batal" selected>Batal</option>
-                                </select>
-                                <button onclick="saveStatus(103)" class="btn-primary">Simpan</button>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <!-- Row 4 -->
-                    <tr id="row-104">
-                        <td style="font-weight: 700; color: var(--slate-900);">#104</td>
-                        <td style="font-size: 0.75rem;">23 Jun 2026, 16:30</td>
-                        <td>Dewi Lestari</td>
-                        <td>
-                            <strong>Nasi Goreng Kampung</strong>
-                            <span style="font-size: 0.75rem; color: var(--slate-400); display: block;">Jumlah: 1 Porsi</span>
-                        </td>
-                        <td><span style="font-size: 0.75rem; font-weight: 600;">E-Wallet</span></td>
-                        <td style="font-weight: 800; color: var(--slate-900);">Rp 25.000</td>
-                        <td class="cell-status-pesanan">
-                            <span class="badge badge-pending"><i class="fa-solid fa-spinner fa-spin"></i> Proses</span>
-                        </td>
-                        <td class="cell-status-pembayaran">
-                            <span class="badge badge-pending"><i class="fa-solid fa-circle-exclamation"></i> Belum Lunas</span>
-                        </td>
-                        <td style="text-align: center;">
-                            <div style="display: flex; gap: 8px; justify-content: center; align-items: center;">
-                                <select class="status-select select-pesanan">
-                                    <option value="Proses" selected>Proses</option>
-                                    <option value="Selesai">Selesai</option>
-                                    <option value="Batal">Batal</option>
-                                </select>
-                                <select class="status-select select-pembayaran">
-                                    <option value="Belum Lunas" selected>Belum Lunas</option>
-                                    <option value="Lunas">Lunas</option>
-                                </select>
-                                <button onclick="saveStatus(104)" class="btn-primary">Simpan</button>
-                            </div>
-                        </td>
-                    </tr>
+                    <?php if (empty($pesananData)): ?>
+                        <tr>
+                            <td colspan="9" style="text-align: center; padding: 40px; color: var(--slate-400);">
+                                Tidak ada pesanan ditemukan di database.
+                            </td>
+                        </tr>
+                    <?php else: ?>
+                        <?php foreach ($pesananData as $row): ?>
+                            <tr id="row-<?= htmlspecialchars($row['id']) ?>">
+                                <td style="font-weight: 700; color: var(--slate-900);">#<?= htmlspecialchars($row['id']) ?></td>
+                                <td style="font-size: 0.75rem;"><?= date('d M Y, H:i', strtotime($row['created_at'])) ?></td>
+                                <td><?= htmlspecialchars($row['nama']) ?></td>
+                                <td>
+                                    <strong><?= htmlspecialchars($row['nama_menu']) ?></strong>
+                                    <span style="font-size: 0.75rem; color: var(--slate-400); display: block;">Jumlah: <?= htmlspecialchars($row['jumlah']) ?> Porsi</span>
+                                </td>
+                                <td><span style="font-size: 0.75rem; font-weight: 600;"><?= htmlspecialchars($row['metode_pembayaran']) ?></span></td>
+                                <td style="font-weight: 800; color: var(--slate-900);">Rp <?= number_format($row['total_harga'], 0, ',', '.') ?></td>
+                                <td class="cell-status-pesanan">
+                                    <?php if ($row['status'] === 'Selesai'): ?>
+                                        <span class="badge badge-success"><i class="fa-solid fa-check"></i> Selesai</span>
+                                    <?php elseif ($row['status'] === 'Batal'): ?>
+                                        <span class="badge badge-danger"><i class="fa-solid fa-xmark"></i> Batal</span>
+                                    <?php else: ?>
+                                        <span class="badge badge-pending"><i class="fa-solid fa-spinner fa-spin"></i> <?= htmlspecialchars($row['status']) ?></span>
+                                    <?php endif; ?>
+                                </td>
+                                <td class="cell-status-pembayaran">
+                                    <?php if ($row['status_pembayaran'] === 'Lunas'): ?>
+                                        <span class="badge badge-success"><i class="fa-solid fa-circle-check"></i> Lunas</span>
+                                    <?php elseif ($row['status_pembayaran'] === 'Batal'): ?>
+                                        <span class="badge badge-danger"><i class="fa-solid fa-circle-xmark"></i> Batal</span>
+                                    <?php else: ?>
+                                        <span class="badge badge-pending"><i class="fa-solid fa-circle-exclamation"></i> <?= htmlspecialchars($row['status_pembayaran']) ?></span>
+                                    <?php endif; ?>
+                                </td>
+                                <td style="text-align: center;">
+                                    <form method="post" style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; align-items: center;">
+                                        <input type="hidden" name="id_pesanan" value="<?= htmlspecialchars($row['id']) ?>">
+                                        <select class="status-select" name="status_pesanan">
+                                            <option value="Proses" <?= $row['status'] === 'Proses' ? 'selected' : '' ?>>Proses</option>
+                                            <option value="Menunggu Pembayaran" <?= $row['status'] === 'Menunggu Pembayaran' ? 'selected' : '' ?>>Menunggu Pembayaran</option>
+                                            <option value="Selesai" <?= $row['status'] === 'Selesai' ? 'selected' : '' ?>>Selesai</option>
+                                            <option value="Batal" <?= $row['status'] === 'Batal' ? 'selected' : '' ?>>Batal</option>
+                                        </select>
+                                        <select class="status-select" name="status_pembayaran">
+                                            <option value="Belum Bayar" <?= $row['status_pembayaran'] === 'Belum Bayar' ? 'selected' : '' ?>>Belum Bayar</option>
+                                            <option value="Belum Lunas" <?= $row['status_pembayaran'] === 'Belum Lunas' ? 'selected' : '' ?>>Belum Lunas</option>
+                                            <option value="Lunas" <?= $row['status_pembayaran'] === 'Lunas' ? 'selected' : '' ?>>Lunas</option>
+                                            <option value="Batal" <?= $row['status_pembayaran'] === 'Batal' ? 'selected' : '' ?>>Batal</option>
+                                        </select>
+                                        <button type="submit" name="update_status" class="btn-primary">Simpan</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                 </tbody>
             </table>
         </div>
@@ -628,115 +615,6 @@ if (isset($_POST['logout'])) {
         </div>
     </footer>
 
-    <!-- Custom Alert Box -->
-    <div id="custom-alert" class="alert-overlay">
-        <div class="alert-card">
-            <div class="alert-icon-box">
-                <i class="fa-solid fa-circle-check"></i>
-            </div>
-            <div class="alert-content">
-                <h3 id="alert-title">Berhasil</h3>
-                <p id="alert-message">Status pesanan telah diperbarui.</p>
-            </div>
-            <button onclick="closeAlert()" class="btn-alert-close">
-                Tutup Jendela
-            </button>
-        </div>
-    </div>
-
-    <script>
-        // Simulasi database lokal sederhana untuk keperluan visualisasi
-        const dataPesanan = {
-            101: { status_pesanan: 'Proses', status_pembayaran: 'Belum Lunas' },
-            102: { status_pesanan: 'Selesai', status_pembayaran: 'Lunas' },
-            103: { status_pesanan: 'Batal', status_pembayaran: 'Batal' },
-            104: { status_pesanan: 'Proses', status_pembayaran: 'Belum Lunas' }
-        };
-
-        // Menghitung statistik awal secara real-time
-        function updateStatistics() {
-            let pending = 0;
-            let selesai = 0;
-            let batal = 0;
-
-            for (let id in dataPesanan) {
-                const item = dataPesanan[id];
-                if (item.status_pesanan === 'Proses' && item.status_pembayaran === 'Belum Lunas') {
-                    pending++;
-                } else if (item.status_pesanan === 'Selesai') {
-                    selesai++;
-                } else if (item.status_pesanan === 'Batal') {
-                    batal++;
-                }
-            }
-
-            document.getElementById('count-pending').textContent = pending;
-            document.getElementById('count-success').textContent = selesai;
-            document.getElementById('count-failed').textContent = batal;
-        }
-
-        // Menyimpan perubahan status dari dropdown & merender ulang badge baris
-        function saveStatus(id) {
-            const row = document.getElementById(`row-${id}`);
-            const selectPesanan = row.querySelector('.select-pesanan').value;
-            const selectPembayaran = row.querySelector('.select-pembayaran').value;
-
-            // Update database simulasi
-            dataPesanan[id].status_pesanan = selectPesanan;
-            dataPesanan[id].status_pembayaran = selectPembayaran;
-
-            // Perbarui Badge Status Pesanan secara visual
-            const cellPesanan = row.querySelector('.cell-status-pesanan');
-            if (selectPesanan === 'Proses') {
-                cellPesanan.innerHTML = `<span class="badge badge-pending"><i class="fa-solid fa-spinner fa-spin"></i> Proses</span>`;
-            } else if (selectPesanan === 'Selesai') {
-                cellPesanan.innerHTML = `<span class="badge badge-success"><i class="fa-solid fa-check"></i> Selesai</span>`;
-            } else {
-                cellPesanan.innerHTML = `<span class="badge badge-danger"><i class="fa-solid fa-xmark"></i> Batal</span>`;
-            }
-
-            // Perbarui Badge Status Pembayaran secara visual
-            const cellPembayaran = row.querySelector('.cell-status-pembayaran');
-            if (selectPembayaran === 'Belum Lunas') {
-                cellPembayaran.innerHTML = `<span class="badge badge-pending"><i class="fa-solid fa-circle-exclamation"></i> Belum Lunas</span>`;
-            } else if (selectPembayaran === 'Lunas') {
-                cellPembayaran.innerHTML = `<span class="badge badge-success"><i class="fa-solid fa-circle-check"></i> Lunas</span>`;
-            } else {
-                cellPembayaran.innerHTML = `<span class="badge badge-danger"><i class="fa-solid fa-circle-xmark"></i> Batal</span>`;
-            }
-
-            // Rekalkulasi statistik di kotak info atas
-            updateStatistics();
-
-            // Tampilkan custom notification
-            showCustomAlert(
-                "Simpan Berhasil!", 
-                `Data pesanan <strong>#${id}</strong> berhasil diperbarui ke status "${selectPesanan}" dan pembayaran "${selectPembayaran}".`
-            );
-        }
-
-        // Logika custom alert popup
-        const customAlert = document.getElementById('custom-alert');
-        const alertTitle = document.getElementById('alert-title');
-        const alertMessage = document.getElementById('alert-message');
-
-        function showCustomAlert(title, message) {
-            alertTitle.textContent = title;
-            alertMessage.innerHTML = message;
-            customAlert.classList.add('open');
-        }
-
-        function closeAlert() {
-            customAlert.classList.remove('open');
-        }
-
-      
-
-        // Jalankan kalkulasi pertama kali halaman dimuat
-        window.onload = function() {
-            updateStatistics();
-        };
-    </script>
 </body>
 </html>
 

@@ -34,6 +34,7 @@ if(isset($_POST['pesan'])){
         <nav class="nav">
             <a href="#beranda" class="nav-link active" id="nav-beranda">Beranda</a>
             <a href="#menu" class="nav-link" id="nav-menu">Daftar Menu</a>
+            <a href='?page=user' class="nav-link" id="nav-menu">Riwayat Pesanan</a>
         </nav>
 
         <div class="user-action">
