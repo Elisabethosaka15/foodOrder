@@ -12,7 +12,7 @@ class Pesanan extends Database
     /*
     =====================================
     SIMPAN PESANAN BARU
-    =====================================
+    ==================================
     */
 
     public function create($data)
