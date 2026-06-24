@@ -35,13 +35,11 @@ class Pesanan extends Database
 
             $namaPenerima = $data['nama_pelanggan'];
             $noHp = $data['no_hp'] ?? '';
-            $catatan = $data['catatan'] ?? '';
-
             $jumlah = $data['jumlah'];
 
             $metodePembayaran =
             $data['metode_pembayaran'];
-
+           
             /*
             ============================
             AMBIL DATA MENU
@@ -89,7 +87,7 @@ class Pesanan extends Database
             */
 
             $statusPesanan =
-            "Menunggu";
+            "Menunggu Pembayaran";
 
             $createdAt =
             date('Y-m-d H:i:s');
@@ -102,22 +100,20 @@ class Pesanan extends Database
                     user_id,
                     nama_penerima,
                     no_hp,
-                    catatan,
                     total_harga,
                     status,
                     created_at
                 )
                 VALUES
-                (?,?,?,?,?,?,?,?)"
+                (?,?,?,?,?,?,?)"
             );
 
             $stmtPesanan->bind_param(
-                "sisssiss",
+                "sississ",
                 $kodePesanan,
                 $userId,
                 $namaPenerima,
                 $noHp,
-                $catatan,
                 $totalHarga,
                 $statusPesanan,
                 $createdAt
@@ -166,7 +162,7 @@ class Pesanan extends Database
             */
 
             $statusPembayaran =
-            "Menunggu";
+            "Belum Bayar";
 
             $nomorReferensi = NULL;
             $buktiPembayaran = NULL;
@@ -212,6 +208,8 @@ class Pesanan extends Database
             return true;
 
         } catch (Exception $e) {
+            var_dump($e->getMessage());
+            die;
 
             $conn->rollback();
 

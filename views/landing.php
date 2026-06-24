@@ -16,6 +16,10 @@ if (isset($_POST['logout'])) {
         exit;
     }
 }
+
+if(isset($_POST['pesan'])){
+    $pesan->pesan();
+}
 ?>
 
 <header class="header" id="main-header">
@@ -158,7 +162,7 @@ if (isset($_POST['logout'])) {
             </div>
         </div>
 
-        <form id="direct-order-form" method="post" action="">
+        <form id="direct-order-form" method="post" >
             <input type="hidden" id="input-menu-id" name="id_menu">
             <input type="hidden" id="input-menu-harga">
 
@@ -179,9 +183,8 @@ if (isset($_POST['logout'])) {
             <div class="form-group">
                 <label class="form-label">Metode Pembayaran (Tabel: pembayaran)</label>
                 <select id="payment-method" name="metode_pembayaran" class="form-input" style="cursor: pointer;">
-                    <option value="Transfer Bank">Transfer Bank / Virtual Account</option>
-                    <option value="E-Wallet">E-Wallet (OVO / GoPay / Dana)</option>
-                    <option value="Tunai">Bayar Tunai di Kasir (COD)</option>
+                    <option value="QRIS">E-Wallet (OVO / GoPay / Dana)</option>
+                    <option value="Cash">Bayar Tunai di Kasir (COD)</option>
                 </select>
             </div>
 

@@ -1,12 +1,25 @@
+<?php
+
+$auth = new AuthController();
+
+if (isset($_POST['logout'])) {
+    if ($auth->logout()) {
+        echo "
+        <script>
+        window.location.href = 'index.php';
+        </script>
+        ";
+        exit;
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pratinjau Dashboard Admin - RasaNusantara</title>
-    <!-- Font Awesome untuk Icon -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
@@ -401,9 +414,12 @@
             </div>
             <div style="display: flex; align-items: center; gap: 12px;">
                 <span style="font-size: 0.85rem; font-weight: 600; color: var(--slate-600);">Administrator: <strong>Elisabeth</strong></span>
-                <button onclick="logoutDemo()" class="btn-auth" style="color: var(--primary); border-color: var(--primary-border); background-color: var(--primary-light);">
-                    <i class="fa-solid fa-right-from-bracket"></i> Logout
-                </button>
+                <form  method="post">
+                    <button name="logout" type="submit"  class="btn-auth" style="color: var(--primary); border-color: var(--primary-border); background-color: var(--primary-light);">
+                        <i class="fa-solid fa-right-from-bracket"></i> Logout
+                    </button>
+                </form>
+                
             </div>
         </div>
     </header>
@@ -714,9 +730,7 @@
             customAlert.classList.remove('open');
         }
 
-        function logoutDemo() {
-            showCustomAlert("Logout Berhasil", "Sesi administrator Anda telah diakhiri (Mode Simulasi).");
-        }
+      
 
         // Jalankan kalkulasi pertama kali halaman dimuat
         window.onload = function() {

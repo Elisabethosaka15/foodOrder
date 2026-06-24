@@ -36,7 +36,7 @@ class PesananController
             User Login Session Check
             ========================
             */
-            $userId = $_SESSION['id'] ?? NULL;
+            $userId = $_SESSION['user_id'] ?? NULL;
 
             /*
             ========================
@@ -53,8 +53,10 @@ class PesananController
                 'tanggal_pesanan' => date('Y-m-d H:i:s')
             ];
 
+          
             // Kirim data ke Model Pesanan untuk memproses transaksi database (multi-table insert)
             $simpan = $this->pesanan->create($data);
+         
 
             if ($simpan) {
                 echo "
