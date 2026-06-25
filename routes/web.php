@@ -17,6 +17,11 @@ switch ($page) {
             './views/admin/dasboard.php';
         break;
 
+    case 'admin_menu':
+        require
+            './views/admin/menu.php';
+        break;
+
     case 'user':
         require
             './views/user/dasboard.php';

@@ -42,7 +42,7 @@ if ($pesananResult) {
 
         if ($row['status'] === 'Selesai') {
             $stats['success']++;
-        } elseif ($row['status'] === 'Batal') {
+        } elseif ($row['status'] === 'Dibatalkan') {
             $stats['failed']++;
         } else {
             $stats['pending']++;
@@ -491,7 +491,9 @@ if ($pesananResult) {
         <div class="admin-title-section">
             <div>
                 <h1>Dashboard Admin</h1>
-                <p>Kelola, pantau, dan validasi seluruh pesanan hidangan masuk (Mode Simulasi Interaktif).</p>
+            </div>
+            <div style="display:flex; gap:10px; align-items:center;">
+                <a href="index.php?page=admin_menu" class="btn-primary"><i class="fa-solid fa-utensils"></i> Kelola Menu</a>
             </div>
         </div>
 
@@ -552,9 +554,10 @@ if ($pesananResult) {
                             </td>
                         </tr>
                     <?php else: ?>
+                        <?php $no = 1 ?>
                         <?php foreach ($pesananData as $row): ?>
                             <tr id="row-<?= htmlspecialchars($row['id']) ?>">
-                                <td style="font-weight: 700; color: var(--slate-900);">#<?= htmlspecialchars($row['id']) ?></td>
+                                <td style="font-weight: 700; color: var(--slate-900);">#<?= $no++ ?></td>
                                 <td style="font-size: 0.75rem;"><?= date('d M Y, H:i', strtotime($row['created_at'])) ?></td>
                                 <td><?= htmlspecialchars($row['nama']) ?></td>
                                 <td>
@@ -585,16 +588,14 @@ if ($pesananResult) {
                                     <form method="post" style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; align-items: center;">
                                         <input type="hidden" name="id_pesanan" value="<?= htmlspecialchars($row['id']) ?>">
                                         <select class="status-select" name="status_pesanan">
-                                            <option value="Proses" <?= $row['status'] === 'Proses' ? 'selected' : '' ?>>Proses</option>
                                             <option value="Menunggu Pembayaran" <?= $row['status'] === 'Menunggu Pembayaran' ? 'selected' : '' ?>>Menunggu Pembayaran</option>
                                             <option value="Selesai" <?= $row['status'] === 'Selesai' ? 'selected' : '' ?>>Selesai</option>
-                                            <option value="Batal" <?= $row['status'] === 'Batal' ? 'selected' : '' ?>>Batal</option>
+                                            <option value="Dibatalkan" <?= $row['status'] === 'Dibatalkan' ? 'selected' : '' ?>>Dibatalkan</option>
                                         </select>
                                         <select class="status-select" name="status_pembayaran">
                                             <option value="Belum Bayar" <?= $row['status_pembayaran'] === 'Belum Bayar' ? 'selected' : '' ?>>Belum Bayar</option>
-                                            <option value="Belum Lunas" <?= $row['status_pembayaran'] === 'Belum Lunas' ? 'selected' : '' ?>>Belum Lunas</option>
                                             <option value="Lunas" <?= $row['status_pembayaran'] === 'Lunas' ? 'selected' : '' ?>>Lunas</option>
-                                            <option value="Batal" <?= $row['status_pembayaran'] === 'Batal' ? 'selected' : '' ?>>Batal</option>
+                                            <option value="Ditolak" <?= $row['status_pembayaran'] === 'Ditolak' ? 'selected' : '' ?>>Ditolak</option>
                                         </select>
                                         <button type="submit" name="update_status" class="btn-primary">Simpan</button>
                                     </form>
@@ -610,8 +611,8 @@ if ($pesananResult) {
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
-            <p>RasaNusantara - Pratinjau Panel Dashboard Admin</p>
-            <p>&copy; 2026 RasaNusantara. Mode simulasi lokal.</p>
+            <p>NikmatRasa</p>
+            <p>&copy; 2026 NikmatRasa</p>
         </div>
     </footer>
 

@@ -17,7 +17,7 @@ if (isset($_POST['logout'])) {
     }
 }
 
-if(isset($_POST['pesan'])){
+if (isset($_POST['pesan'])) {
     $pesan->pesan();
 }
 ?>
@@ -28,7 +28,7 @@ if(isset($_POST['pesan'])){
             <span class="logo-icon">
                 <i class="fa-solid fa-utensils"></i>
             </span>
-            <span class="logo-text">Rasa<span>Nusantara</span></span>
+            <span class="logo-text">Nikmat<span>Rasa</span></span>
         </div>
 
         <nav class="nav">
@@ -89,8 +89,16 @@ if(isset($_POST['pesan'])){
 
             <div class="menu-header">
                 <div class="menu-title-block">
-                    <h2>Daftar Menu Hidangan</h2>
-                    <p>Sistem Pemesanan Langsung terintegrasi dengan tabel database</p>
+                    <h2 style ='margin-bottom : 20px;'>Daftar Menu Hidangan</h2>
+                    <div class="search-container">
+                        <input
+                            type="text"
+                            id="menu-search"
+                            class="search-input"
+                            placeholder="Cari masakan atau minuman..."
+                            onkeyup="searchMenu()">
+                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                    </div>
                 </div>
 
                 <div class="filter-container">
@@ -101,21 +109,28 @@ if(isset($_POST['pesan'])){
             </div>
 
             <div class="menu-grid" id="menu-container">
-                <?php $result = $menu->getMenu()?>
+                <?php $result = $menu->getMenu() ?>
 
                 <?php while ($row = $result->fetch_assoc()) { ?>
                     <div class="menu-item" data-category="<?= $row['kategori']; ?>" data-id="<?= $row['id']; ?>">
                         <div class="item-media">
-                            <i class="fa-solid fa-bowl-rice"></i>
-                            <span class="item-db-id">ID Menu: <?= $row['id']; ?></span>
+                            <?php if (!empty($row['foto'])): ?>
+                                <img src="uploads/menu/<?= htmlspecialchars($row['foto']) ?>" alt="<?= htmlspecialchars($row['nama_menu']) ?>">
+                            <?php else: ?>
+                                <i class="fa-solid fa-bowl-rice"></i>
+                            <?php endif; ?>
                         </div>
 
                         <div class="item-content">
-                            <h3 class="item-title"><?= $row['nama_menu']; ?></h3>
+                            <h3 class="item-title"><?= htmlspecialchars($row['nama_menu']); ?></h3>
 
                             <p class="item-desc">
-                                <?= $row['deskripsi']; ?>
+                                <?= htmlspecialchars($row['deskripsi']); ?>
                             </p>
+
+                            <div class="item-stock" style="color: var(--slate-400); font-size: 0.82rem; font-weight: 600;">
+                                Stok: <?= htmlspecialchars($row['stok'] ?? 0); ?> pcs
+                            </div>
 
                             <div class="item-action-area">
                                 <span class="item-price">
@@ -148,7 +163,6 @@ if(isset($_POST['pesan'])){
         <div class="modal-header">
             <div class="modal-header-text">
                 <h3><i class="fa-solid fa-file-invoice" style="color: var(--primary);"></i> Form Pemesanan</h3>
-                <p>Memasukkan data ke tabel: <span>pesanan, detail_pesanan, pembayaran</span></p>
             </div>
             <button onclick="closeOrderModal()" class="btn-close-modal">
                 <i class="fa-solid fa-xmark"></i>
@@ -163,12 +177,12 @@ if(isset($_POST['pesan'])){
             </div>
         </div>
 
-        <form id="direct-order-form" method="post" >
+        <form id="direct-order-form" method="post">
             <input type="hidden" id="input-menu-id" name="id_menu">
             <input type="hidden" id="input-menu-harga">
 
             <div class="form-group">
-                <label class="form-label">Jumlah Porsi (Tabel: detail_pesanan)</label>
+                <label class="form-label">Jumlah Porsi</label>
                 <div class="qty-control">
                     <button type="button" onclick="adjustQty(-1)" class="btn-qty">-</button>
                     <input type="number" id="input-qty" name="jumlah" value="1" min="1" class="input-qty-number" readonly>
@@ -177,12 +191,12 @@ if(isset($_POST['pesan'])){
             </div>
 
             <div class="form-group">
-                <label class="form-label">Nama Lengkap Pelanggan (Tabel: users)</label>
+                <label class="form-label">Nama Lengkap Pelanggan</label>
                 <input type="text" id="customer-name" name="nama_pelanggan" placeholder="Masukkan nama lengkap Anda" class="form-input" required>
             </div>
 
             <div class="form-group">
-                <label class="form-label">Metode Pembayaran (Tabel: pembayaran)</label>
+                <label class="form-label">Metode Pembayaran</label>
                 <select id="payment-method" name="metode_pembayaran" class="form-input" style="cursor: pointer;">
                     <option value="QRIS">E-Wallet (OVO / GoPay / Dana)</option>
                     <option value="Cash">Bayar Tunai di Kasir (COD)</option>
@@ -204,8 +218,8 @@ if(isset($_POST['pesan'])){
 
 <footer class="footer">
     <div class="container">
-        <p class="footer-main-text">RasaNusantara - Landing Page PHP Native MVC Framework</p>
-        <p>&copy; 2026 RasaNusantara. Integrasi tabel database: <code>menu, users, pesanan, detail_pesanan, pembayaran</code></p>
+        <p class="footer-main-text">NikmatRasa</p>
+        <p>&copy; 2026 NikmatRasa</code></p>
     </div>
 </footer>
 
@@ -216,7 +230,6 @@ if(isset($_POST['pesan'])){
         </div>
         <div class="alert-content">
             <h3 id="alert-title">Pesanan Berhasil</h3>
-            <p id="alert-message">Detail pesan sukses simulasi database.</p>
         </div>
         <button onclick="closeAlert()" class="btn-alert-close">
             Tutup Jendela
@@ -238,6 +251,9 @@ if(isset($_POST['pesan'])){
     const alertTitle = document.getElementById('alert-title');
     const alertMessage = document.getElementById('alert-message');
 
+    let currentCategory = 'semua';
+    let currentSearchQuery = '';
+
     // Scroll shadow header effect
     window.addEventListener('scroll', () => {
         if (window.scrollY > 20) {
@@ -249,6 +265,10 @@ if(isset($_POST['pesan'])){
 
     // Membuka modal form pesanan instan
     function openOrderModal(idMenu, namaMenu, harga) {
+        if (!<?= isset($_SESSION['nama']) ? 'true' : 'false' ?>) {
+            window.location.href = 'index.php?page=login';
+            return;
+        }
         selectedMenuName.textContent = namaMenu;
         selectedMenuPriceText.textContent = `Rp ${harga.toLocaleString('id-ID')}`;
         inputMenuId.value = idMenu;
@@ -262,11 +282,145 @@ if(isset($_POST['pesan'])){
         orderModal.classList.add('open');
     }
 
+ // ============================
+// SEARCH & FILTER MENU
+// ============================
+
+function applyMenuFilters() {
+    const items = document.querySelectorAll('.menu-item');
+    let itemDitemukan = 0;
+
+    items.forEach(item => {
+        const category = item.getAttribute('data-category');
+
+        const title = item
+            .querySelector('.item-title')
+            .textContent
+            .toLowerCase();
+
+        const desc = item
+            .querySelector('.item-desc')
+            .textContent
+            .toLowerCase();
+
+        const matchCategory =
+            currentCategory === 'semua' ||
+            category === currentCategory;
+
+        const matchSearch =
+            title.includes(currentSearchQuery) ||
+            desc.includes(currentSearchQuery);
+
+        if (matchCategory && matchSearch) {
+            item.classList.remove('hidden');
+            itemDitemukan++;
+        } else {
+            item.classList.add('hidden');
+        }
+    });
+
+    // ============================
+    // TAMPILKAN PESAN JIKA KOSONG
+    // ============================
+    let noResultMsg =
+        document.getElementById('no-result-message');
+
+    if (itemDitemukan === 0) {
+
+        if (!noResultMsg) {
+
+            noResultMsg =
+                document.createElement('div');
+
+            noResultMsg.id = 'no-result-message';
+
+            noResultMsg.style.gridColumn = '1 / -1';
+            noResultMsg.style.textAlign = 'center';
+            noResultMsg.style.padding = '40px 20px';
+            noResultMsg.style.color = '#94a3b8';
+
+            noResultMsg.innerHTML = `
+                <i class="fa-solid fa-magnifying-glass"
+                    style="
+                        font-size: 2.5rem;
+                        margin-bottom: 12px;
+                        color: #cbd5e1;
+                        display: block;">
+                </i>
+
+                <p style="
+                    font-weight: 600;
+                    font-size: 1.05rem;">
+                    Menu tidak ditemukan
+                </p>
+
+                <p style="
+                    font-size: 0.85rem;
+                    color: #a1a1aa;">
+                    Silakan coba kata kunci lain
+                </p>
+            `;
+
+            document
+                .getElementById('menu-container')
+                .appendChild(noResultMsg);
+        }
+
+    } else {
+
+        if (noResultMsg) {
+            noResultMsg.remove();
+        }
+
+    }
+}
+
+// ============================
+// SEARCH MENU
+// ============================
+function searchMenu() {
+
+    const searchInput =
+        document.getElementById('menu-search');
+
+    currentSearchQuery =
+        searchInput.value.toLowerCase().trim();
+
+    applyMenuFilters();
+}
+
+// ============================
+// FILTER KATEGORI
+// ============================
+function filterMenu(category) {
+
+    currentCategory = category;
+
+    const buttons =
+        document.querySelectorAll('.menu-filter-btn');
+
+    buttons.forEach(btn => {
+
+        btn.classList.remove('active');
+
+        if (
+            btn.getAttribute('data-category')
+            === category
+        ) {
+            btn.classList.add('active');
+        }
+
+    });
+
+    applyMenuFilters();
+}
+
     // Menutup modal form pesanan
     function closeOrderModal() {
         orderModal.classList.remove('open');
     }
 
+    
     // Mengubah porsi menu (+ / -)
     function adjustQty(amount) {
         let currentQty = parseInt(inputQty.value) || 1;
@@ -340,5 +494,5 @@ if(isset($_POST['pesan'])){
     });
 </script>
 </body>
-</html>
 
+</html>

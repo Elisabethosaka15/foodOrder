@@ -61,7 +61,7 @@ class PesananController
             if ($simpan) {
                 echo "
                 <script>
-                    alert('Pesanan berhasil dibuat! Silakan lakukan pembayaran.');
+                    alert('Pesanan berhasil dibuat! Silahkan menunggu.');
                     window.location.href = 'index.php';
                 </script>
                 ";
@@ -100,6 +100,11 @@ class PesananController
     {
         // Mendelegasikan pembaruan status ke Model Pesanan
         return $this->pesanan->updateStatus($id_pesanan, $status_pesanan, $status_pembayaran);
+    }
+
+    public function cancelPesanan($id_pesanan, $userId)
+    {
+        return $this->pesanan->cancel($id_pesanan, $userId);
     }
 }
 ?>

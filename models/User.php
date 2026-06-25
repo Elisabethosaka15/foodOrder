@@ -21,27 +21,55 @@ class User extends Database
             PASSWORD_DEFAULT
         );
 
+        $role = 'user';
+
         $stmt = $conn->prepare(
             "INSERT INTO users
             (
                 nama,
                 username,
                 email,
-                password
+                password,
+                role
             )
             VALUES
-            (?,?,?,?)"
+            (?,?,?,?,?)"
         );
 
         $stmt->bind_param(
-            "ssss",
+            "sssss",
             $nama,
             $username,
             $email,
-            $hash
+            $hash,
+            $role
         );
 
         return $stmt->execute();
+    }
+
+    public function getByEmail(
+        $email
+    )
+    {
+        $conn = $this->connect();
+
+        $stmt = $conn->prepare(
+            "SELECT *
+             FROM users
+             WHERE email=?"
+        );
+
+        $stmt->bind_param(
+            "s",
+            $email
+        );
+
+        $stmt->execute();
+
+        return $stmt
+                ->get_result()
+                ->fetch_assoc();
     }
 
     public function getByUsername(

@@ -5,6 +5,21 @@
 $pesanController = new PesananController();
 $userId = $_SESSION['user_id']; // Mengambil ID user dari sesi login aktif
 
+$feedbackMessage = null;
+$feedbackType = null;
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_order'])) {
+    $orderId = intval($_POST['order_id']);
+
+    if ($pesanController->cancelPesanan($orderId, $userId)) {
+        $feedbackMessage = "Pesanan #$orderId berhasil dibatalkan.";
+        $feedbackType = 'success';
+    } else {
+        $feedbackMessage = "Pesanan tidak dapat dibatalkan. Pastikan status pesanan belum selesai atau batal.";
+        $feedbackType = 'error';
+    }
+}
+
 //Mengambil riwayat transaksi belanja user tersebut
 $riwayatPesanan = $pesanController->getRiwayatBelanjaUser($userId);
 
@@ -227,6 +242,90 @@ include 'views/layouts/header.php';
         margin-bottom: 16px;
         color: var(--primary);
     }
+
+    .notification {
+        width: 100%;
+        padding: 18px 20px;
+        border-radius: 18px;
+        margin-bottom: 24px;
+        border: 1px solid transparent;
+        box-shadow: var(--shadow-sm);
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+
+    .notification-success {
+        background-color: #dcfce7;
+        border-color: #bbf7d0;
+        color: #166534;
+    }
+
+    .notification-error {
+        background-color: #fee2e2;
+        border-color: #fecaca;
+        color: #991b1b;
+    }
+
+    .btn-cancel {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 10px 16px;
+        border-radius: 14px;
+        border: 1px solid #f5c2c7;
+        background-color: #f8d7da;
+        color: #842029;
+        font-weight: 700;
+        cursor: pointer;
+        transition: var(--transition);
+        margin-top: 18px;
+    }
+
+    .btn-cancel:hover {
+        background-color: #f1b0b7;
+    }
+
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 14px;
+        border-radius: 999px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        border: 1px solid transparent;
+    }
+
+    .badge-success {
+        background-color: #dcfce7;
+        color: #166534;
+        border-color: #bbf7d0;
+    }
+
+    .badge-pending {
+        background-color: #ffedd5;
+        color: #92400e;
+        border-color: #fed7aa;
+    }
+
+    .badge-danger {
+        background-color: #fee2e2;
+        color: #991b1b;
+        border-color: #fecaca;
+    }
+
+    .order-canceled-label {
+        display: inline-flex;
+        align-items: center;
+        padding: 10px 16px;
+        border-radius: 18px;
+        background-color: #fde2e2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
+        font-weight: 700;
+        margin-top: 16px;
+    }
 </style>
 
 <main>
@@ -236,7 +335,6 @@ include 'views/layouts/header.php';
                 <div>
                     <span class="hero-badge">Dashboard Pelanggan</span>
                     <h1 class="hero-title">Halo, <?= htmlspecialchars($_SESSION['nama']) ?>!</h1>
-                    <p class="hero-desc">Sesuai dengan gaya landing page, halaman ini menampilkan status pesanan Anda dengan tampilan yang bersih, modern, dan mudah dibaca.</p>
                     <div style="margin-top: 30px; display: flex; flex-wrap: wrap; gap: 14px;">
                         <a href="index.php" class="btn-primary">
                             Pesan Menu Baru <i class="fa-solid fa-arrow-right"></i>
@@ -273,13 +371,18 @@ include 'views/layouts/header.php';
         <div class="container">
             <div class="order-header">
                 <h2>Status Pesanan Anda</h2>
-                <p>Semua riwayat pesanan Anda ditampilkan dengan gaya yang konsisten dan selaras dengan landing page.</p>
             </div>
+
+            <?php if ($feedbackMessage): ?>
+                <div class="notification <?= $feedbackType === 'success' ? 'notification-success' : 'notification-error' ?>">
+                    <?= htmlspecialchars($feedbackMessage) ?>
+                </div>
+            <?php endif; ?>
 
             <?php if (empty($pesananData)): ?>
                 <div class="order-empty">
                     <i class="fa-solid fa-receipt"></i>
-                    <p>Anda belum pernah memesan makanan. Yuk pilih menu nusantara favoritmu sekarang!</p>
+                    <p>Anda belum pernah memesan makanan. Yuk pilih menu NikmatRasa favoritmu sekarang!</p>
                 </div>
             <?php else: ?>
                 <div class="order-history-grid">
@@ -305,6 +408,21 @@ include 'views/layouts/header.php';
                                     <strong>Rp <?= number_format($row['total_harga'], 0, ',', '.') ?></strong>
                                 </div>
                             </div>
+
+                            <?php if ($row['status_pesanan'] === 'Menunggu Pembayaran'): ?>
+                                <form method="POST" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan pesanan ini?');">
+                                    <input type="hidden" name="order_id" value="<?= $row['id'] ?>">
+                                    <button type="submit" name="cancel_order" class="btn-cancel">Batalkan Pesanan</button>
+                                </form>
+                            <?php endif; ?>
+
+                            <?php if ($row['status_pesanan'] === 'Dibatalkan'): ?>
+                                <div class="order-canceled-label">
+                                    <i class="fa-solid fa-ban"></i>
+                                    Pesanan Dibatalkan
+                                </div>
+                            <?php endif; ?>
+
                             <div class="order-meta" style="margin-top: 20px;">
                                 <span class="badge <?= $row['status_pesanan'] == 'Selesai' ? 'badge-success' : ($row['status_pesanan'] == 'Proses' ? 'badge-pending' : 'badge-danger') ?>">
                                     <i class="fa-solid <?= $row['status_pesanan'] == 'Selesai' ? 'fa-check' : ($row['status_pesanan'] == 'Proses' ? 'fa-spinner fa-spin' : 'fa-xmark') ?>"></i>

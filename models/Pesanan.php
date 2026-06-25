@@ -401,6 +401,77 @@ class Pesanan extends Database
         }
     }
 
+    public function cancel($idPesanan, $userId = null)
+    {
+        $conn = $this->connect();
+        $conn->begin_transaction();
+
+        try {
+            if ($userId !== null) {
+                $stmtCheck = $conn->prepare(
+                    "SELECT status, user_id
+                     FROM pesanan
+                     WHERE id=?"
+                );
+                $stmtCheck->bind_param(
+                    "i",
+                    $idPesanan
+                );
+                $stmtCheck->execute();
+
+                $order = $stmtCheck
+                    ->get_result()
+                    ->fetch_assoc();
+             if (
+                    !$order ||
+                    $order['user_id'] != $userId ||
+                    $order['status'] !== 'Menunggu Pembayaran'
+                ) {
+                  
+                    $conn->rollback();
+                    return false;
+                }
+            }
+            
+
+            $statusPesanan = 'Dibatalkan';
+            $statusPembayaran = 'Ditolak';
+
+            $stmtPesanan = $conn->prepare(
+                "UPDATE pesanan
+                 SET status=?
+                 WHERE id=?"
+            );
+            $stmtPesanan->bind_param(
+                "si",
+                $statusPesanan,
+                $idPesanan
+            );
+            $stmtPesanan->execute();
+
+            $stmtPembayaran = $conn->prepare(
+                "UPDATE pembayaran
+                 SET status=?
+                 WHERE pesanan_id=?"
+            );
+            $stmtPembayaran->bind_param(
+                "si",
+                $statusPembayaran,
+                $idPesanan
+            );
+            $stmtPembayaran->execute();
+
+            $conn->commit();
+            return true;
+
+        } catch (Exception $e) {
+            var_dump($e->getMessage());
+            die;
+            $conn->rollback();
+            return false;
+        }
+    }
+
     /*
     =====================================
     DETAIL PESANAN
