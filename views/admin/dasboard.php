@@ -566,22 +566,30 @@ if ($pesananResult) {
                                 </td>
                                 <td><span style="font-size: 0.75rem; font-weight: 600;"><?= htmlspecialchars($row['metode_pembayaran']) ?></span></td>
                                 <td style="font-weight: 800; color: var(--slate-900);">Rp <?= number_format($row['total_harga'], 0, ',', '.') ?></td>
+                                <!-- Kolom Status Pesanan -->
                                 <td class="cell-status-pesanan">
-                                    <?php if ($row['status'] === 'Selesai'): ?>
+                                    <?php 
+                                        $status_pesanan = $row['status_pesanan'] ?? $row['status'] ?? 'Proses'; 
+                                    ?>
+                                    <?php if ($status_pesanan === 'Selesai'): ?>
                                         <span class="badge badge-success"><i class="fa-solid fa-check"></i> Selesai</span>
-                                    <?php elseif ($row['status'] === 'Batal'): ?>
-                                        <span class="badge badge-danger"><i class="fa-solid fa-xmark"></i> Batal</span>
+                                    <?php elseif (in_array($status_pesanan, ['Batal', 'Dibatalkan', 'Ditolak'])): ?>
+                                        <span class="badge badge-danger"><i class="fa-solid fa-xmark"></i> <?= htmlspecialchars($status_pesanan) ?></span>
                                     <?php else: ?>
-                                        <span class="badge badge-pending"><i class="fa-solid fa-spinner fa-spin"></i> <?= htmlspecialchars($row['status']) ?></span>
+                                        <span class="badge badge-pending"><i class="fa-solid fa-spinner fa-spin"></i> <?= htmlspecialchars($status_pesanan) ?></span>
                                     <?php endif; ?>
                                 </td>
+                                <!-- Kolom Status Pembayaran -->
                                 <td class="cell-status-pembayaran">
-                                    <?php if ($row['status_pembayaran'] === 'Lunas'): ?>
+                                    <?php 
+                                        $status_pembayaran = $row['status_pembayaran'] ?? $row['status'] ?? 'Belum Lunas'; 
+                                    ?>
+                                    <?php if ($status_pembayaran === 'Lunas'): ?>
                                         <span class="badge badge-success"><i class="fa-solid fa-circle-check"></i> Lunas</span>
-                                    <?php elseif ($row['status_pembayaran'] === 'Batal'): ?>
-                                        <span class="badge badge-danger"><i class="fa-solid fa-circle-xmark"></i> Batal</span>
+                                    <?php elseif (in_array($status_pembayaran, ['Batal', 'Dibatalkan', 'Ditolak', 'Kedaluwarsa'])): ?>
+                                        <span class="badge badge-danger"><i class="fa-solid fa-circle-xmark"></i> <?= htmlspecialchars($status_pembayaran) ?></span>
                                     <?php else: ?>
-                                        <span class="badge badge-pending"><i class="fa-solid fa-circle-exclamation"></i> <?= htmlspecialchars($row['status_pembayaran']) ?></span>
+                                        <span class="badge badge-pending"><i class="fa-solid fa-circle-exclamation"></i> <?= htmlspecialchars($status_pembayaran) ?></span>
                                     <?php endif; ?>
                                 </td>
                                 <td style="text-align: center;">

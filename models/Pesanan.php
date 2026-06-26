@@ -34,7 +34,6 @@ class Pesanan extends Database
             $idMenu = $data['id_menu'];
 
             $namaPenerima = $data['nama_pelanggan'];
-            $noHp = $data['no_hp'] ?? '';
             $jumlah = $data['jumlah'];
 
             $metodePembayaran =
@@ -99,21 +98,19 @@ class Pesanan extends Database
                     kode_pesanan,
                     user_id,
                     nama_penerima,
-                    no_hp,
                     total_harga,
                     status,
                     created_at
                 )
                 VALUES
-                (?,?,?,?,?,?,?)"
+                (?,?,?,?,?,?)"
             );
 
             $stmtPesanan->bind_param(
-                "sississ",
+                "sisiss",
                 $kodePesanan,
                 $userId,
                 $namaPenerima,
-                $noHp,
                 $totalHarga,
                 $statusPesanan,
                 $createdAt
@@ -164,33 +161,23 @@ class Pesanan extends Database
             $statusPembayaran =
             "Belum Bayar";
 
-            $nomorReferensi = NULL;
-            $buktiPembayaran = NULL;
-            $tanggalBayar = NULL;
-
             $stmtPembayaran =
             $conn->prepare(
                 "INSERT INTO pembayaran
                 (
                     pesanan_id,
                     metode_pembayaran,
-                    nomor_referensi,
-                    bukti_pembayaran,
-                    tanggal_bayar,
                     jumlah_bayar,
                     status
                 )
                 VALUES
-                (?,?,?,?,?,?,?)"
+                (?,?,?,?)"
             );
 
             $stmtPembayaran->bind_param(
-                "issssis",
+                "isis",
                 $pesananId,
                 $metodePembayaran,
-                $nomorReferensi,
-                $buktiPembayaran,
-                $tanggalBayar,
                 $totalHarga,
                 $statusPembayaran
             );
@@ -236,8 +223,6 @@ class Pesanan extends Database
                 p.kode_pesanan,
 
                 p.nama_penerima,
-
-                p.no_hp,
 
                 p.total_harga,
 
@@ -293,8 +278,6 @@ class Pesanan extends Database
                 p.kode_pesanan,
 
                 p.nama_penerima,
-
-                p.no_hp,
 
                 p.total_harga,
 

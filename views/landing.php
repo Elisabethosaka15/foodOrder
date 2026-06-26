@@ -198,8 +198,8 @@ if (isset($_POST['pesan'])) {
             <div class="form-group">
                 <label class="form-label">Metode Pembayaran</label>
                 <select id="payment-method" name="metode_pembayaran" class="form-input" style="cursor: pointer;">
-                    <option value="QRIS">E-Wallet (OVO / GoPay / Dana)</option>
-                    <option value="Cash">Bayar Tunai di Kasir (COD)</option>
+                    <option value="QRIS">QRIS</option>
+                    <option value="Cash">Bayar Tunai di Kasir</option>
                 </select>
             </div>
 
