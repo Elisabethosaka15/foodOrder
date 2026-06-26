@@ -55,7 +55,7 @@ if ($pesananResult) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pratinjau Dashboard Admin - RasaNusantara</title>
+    <title>NikmatRasa</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
@@ -465,7 +465,7 @@ if ($pesananResult) {
                 <span class="logo-icon">
                     <i class="fa-solid fa-utensils"></i>
                 </span>
-                <span class="logo-text">Rasa<span>Nusantara</span></span>
+                <span class="logo-text">Nikmat<span>Rasa</span></span>
             </div>
             <div style="display: flex; align-items: center; gap: 12px;">
                 <span style="font-size: 0.85rem; font-weight: 600; color: var(--slate-600);">Administrator: <strong>Elisabeth</strong></span>
