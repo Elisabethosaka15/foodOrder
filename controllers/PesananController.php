@@ -8,13 +8,9 @@ class PesananController
 
     public function __construct()
     {
-        // Instansiasi model Pesanan sesuai arsitektur OOP MVC Anda
         $this->pesanan = new Pesanan();
     }
 
-    /**
-     * Menangani pembuatan pesanan langsung dari form pelanggan (landing.php)
-     */
     public function pesan()
     {
         if (isset($_POST['pesan'])) {
